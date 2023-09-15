@@ -29,7 +29,8 @@ class LocalStrategy {
       passwordField: 'password',
       // allows to pass the entire request to the callback
       passReqToCallback: true
-    }, async (req: Request, email: string, password: string, done) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, async (req: Request, email: string, _password: string, done: any) => {
       try {
         if (!email) done(null, false);
         const user = await User.findOne({"email": email.toLowerCase()});

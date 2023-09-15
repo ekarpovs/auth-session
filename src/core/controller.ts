@@ -32,17 +32,10 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const logout = (req: any, res: Response) => {
-  req.logOut((error: Error) => {
+  req.session.destroy((error: Error) => {
     if (error) {
       return res.status(500).send({ message: error, success: false });
     }
-
-    req.session.destroy((error: Error) => {
-      if (error) {
-        return res.status(500).send({ message: error, success: false });
-      }
-    });
-
     return res.status(200).send({ message: "logged Out", success: true });
   });
 };

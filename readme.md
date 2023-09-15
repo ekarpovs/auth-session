@@ -33,6 +33,8 @@ A auth with express session and passport, - a solution for Nodejs applications.
     StorageConfig 
   } from '../src';
 
+  // import { sessionStorage } from '@ekarpovs/session-storage';
+
   // Somewhere in an application
   const app: Express = express();
 
@@ -65,6 +67,17 @@ A auth with express session and passport, - a solution for Nodejs applications.
     User: BaseUser,
     sessionConfig: sessionConfig,
   };
+
+  // Optional - inject session-storage
+    const storageConfig: StorageConfig = {
+    uri: "",
+    db: "",
+    collection: "",
+  };
+
+  // const storage = sessionStorage(storageConfig);
+  // authConfig.storage = { store: storage};
+
 
   // Initialization
   initAuth(authConfig);

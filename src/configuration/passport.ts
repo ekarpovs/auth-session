@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import passport from "passport";
-import { Express, Request, Response, NextFunction } from "express";
-import LocalStrategy from "../strategies/local";
+import { Request, Response, NextFunction } from "express";
+// import { BaseUser } from "../storage/baseUser";
 
-export type PassportConfig = {
-  app: Express;
-  User: any;
-};
+// export type PassportConfig = {
+//   app: Express;
+//   User: any;
+// };
 
-export const initPassport = (config: PassportConfig): void => {
+export const setupPassport = (User: any): void => {
   // Mount strategies
 
-  LocalStrategy.init(passport, config.User);
+  // LocalStrategy.init(passport, config.User);
 
-  passport.serializeUser((user: any, done): void => {
+  passport.serializeUser((id: any, done): void => {
     /***
      * If authentication succeeds, passport.authenticate calls the serializeUser
      * function, passing in the user object. 
      * serializeUser creates a unique identifier for the user and stores it in the session.
      * After the done function, it passes to the next middleware in the chain.
      */
-    done(null, user.id);
+    done(null, id);
   });
 
   passport.deserializeUser((id, done): void => {
@@ -30,7 +30,7 @@ export const initPassport = (config: PassportConfig): void => {
      * and passes it to the next middleware in the chain.
      */
 
-    const user = config.User.findById(id);
+    const user = User.findById(id);
     if (user) { 
       done(null, user); 
     } else {
@@ -38,14 +38,14 @@ export const initPassport = (config: PassportConfig): void => {
     }
   });
 
-  // init passport on every route call
-  config.app.use(passport.initialize());
-  // passport.session has to be used after 
-  // express.session in order to work properly.
-  // allow passport to use "express-session"
-  config.app.use(passport.session());
-  // passport function that calls the strategy to be executed
-  config. app.use(passport.authenticate('session'));
+  // // init passport on every route call
+  // config.app.use(passport.initialize());
+  // // passport.session has to be used after 
+  // // express.session in order to work properly.
+  // // allow passport to use "express-session"
+  // config.app.use(passport.session());
+  // // passport function that calls the strategy to be executed
+  // config. app.use(passport.authenticate('session'));
 };
 
 export const checkAuthenticated = 

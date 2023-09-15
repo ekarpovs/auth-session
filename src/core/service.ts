@@ -15,6 +15,9 @@ export const changePasswordService = async (email: string, password: string, pas
 
   // Check credentials
   user.comparePassword(password, (err: any, isMatch: boolean) => {
+    if (err) {
+      throw new Error("Something wrong with credentials");
+    }
     if (!isMatch) {
       throw new Error("User or password incorrect");
     }

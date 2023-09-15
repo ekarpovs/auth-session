@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import { 
   resetPassword,
   resetPasswordRequest,
@@ -9,6 +9,11 @@ import {
 } from "./controller";
 
 const authRouter = Router();
+
+authRouter.get("/", (req: Request, res: Response) => {
+  console.log(req);
+  res.send('hello world');
+});
 
 authRouter.post("/login", login);
 
