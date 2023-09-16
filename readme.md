@@ -62,6 +62,7 @@ export const User = BaseUser.discriminator("user", UserSchema);
   
   // Optional:
   // import { StorageConfig, sessionStorage } from '@ekarpovs/session-storage';
+  // import { EmailClient } from '@ekarpovs/simple-email-client';
 
   // Somewhere in an application
   const app: Express = express();
@@ -91,7 +92,7 @@ export const User = BaseUser.discriminator("user", UserSchema);
   };
 
   // Optional: - inject session-storage
-    const storageConfig: StorageConfig = {
+  const storageConfig: StorageConfig = {
     uri: "",
     db: "",
     collection: "",
@@ -99,6 +100,16 @@ export const User = BaseUser.discriminator("user", UserSchema);
 
   // const storage = sessionStorage(storageConfig);
   // authConfig.storage = { store: storage};
+
+  // Optional: inject simple-email-client
+  const config = {
+    name: "gmail",
+    user: "<the-account-owner-email>",
+    password: "<the-account-owner-password>"
+  };
+
+const emailClient = new EmailClient(config);
+authConfig.emailer = emailClient;
 
   initAuth(authConfig);
 
