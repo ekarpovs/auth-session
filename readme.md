@@ -22,6 +22,34 @@ A auth with express session and passport, - a solution for Nodejs applications.
   npm install @ekarpovs/auth-session
 ```
 ### Usage
+#### Optional: extend user model, 
+```
+  // for example two property are added (isSuperAdmin and phone):
+import { Schema } from "mongoose";
+
+import { BaseUser } from "../lib/auth-session";
+
+
+export interface UserInterface {
+  isSuperAdmin: boolean;
+  phone?: string;
+}
+
+const UserSchema = new Schema<UserInterface>({
+  isSuperAdmin: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  phone: {
+    type: String,
+    required: false,
+  },
+}, {collection: 'users'});
+
+export const User = BaseUser.discriminator("user", UserSchema);
+```
+#### Initialize:
 ```
   import express, { Express } from 'express';
 
@@ -30,22 +58,16 @@ A auth with express session and passport, - a solution for Nodejs applications.
     BaseUser,
     CookieConfig,
     SessionConfig,
-    StorageConfig 
-  } from '../src';
-
-  // import { sessionStorage } from '@ekarpovs/session-storage';
+  } from '@ekarpovs/auth-session';
+  
+  // Optional:
+  // import { StorageConfig, sessionStorage } from '@ekarpovs/session-storage';
 
   // Somewhere in an application
   const app: Express = express();
 
 
   // Configuration
-  const storageConfig: StorageConfig = {
-    uri: "",
-    db: "",
-    collection: "",
-  };
-
   const cookieConfig: CookieConfig = {
     secure: "false",
     sameSite: "lax",
@@ -63,12 +85,12 @@ A auth with express session and passport, - a solution for Nodejs applications.
 
   const authConfig: AuthConfig = {
     app: app,
-    storageConfig: storageConfig,
+    storage: undefined,
     User: BaseUser,
     sessionConfig: sessionConfig,
   };
 
-  // Optional - inject session-storage
+  // Optional: - inject session-storage
     const storageConfig: StorageConfig = {
     uri: "",
     db: "",
@@ -78,11 +100,8 @@ A auth with express session and passport, - a solution for Nodejs applications.
   // const storage = sessionStorage(storageConfig);
   // authConfig.storage = { store: storage};
 
-
-  // Initialization
   initAuth(authConfig);
 
   // Usage
   ...
-
 ```

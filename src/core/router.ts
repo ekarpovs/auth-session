@@ -11,7 +11,6 @@ import {
 const authRouter = Router();
 
 authRouter.get("/", (req: Request, res: Response) => {
-  console.log(req);
   res.send('hello world');
 });
 
