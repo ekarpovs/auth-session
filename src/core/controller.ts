@@ -8,8 +8,7 @@ import {
   resetPasswordService
 } from "./service";
 
-// import { buildEmailOptions } from "../../services/emailService/EmailServiceConfig";
-// import { sendEmail } from "../../services/emailService/EmailService";
+import { emailer } from "../bootstrap";
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate(
@@ -71,8 +70,7 @@ export const resetPasswordRequest = async (req: Request, res: Response) => {
   const { email } = req.body;
   try {
     const emailParams = await resetPasswordRequestService(email);
-    // const emailOptions = buildEmailOptions("resetPasswordRequest", emailParams);
-    // await sendEmail(emailOptions);
+    await sendEmail("resetPasswordRequest", emailParams);
     return res.status(200).send({ params: emailParams , success: true });
   } catch (error: Error | any) {
     return res.status(500).json({ message: error.message });
@@ -83,10 +81,17 @@ export const resetPassword = async (req: Request, res: Response) => {
   const { user, token, password } = req.body;
   try {
     const emailParams = await resetPasswordService(user, token, password);
-    // const emailOptions = buildEmailOptions("resetPassword", emailParams);
-    // await sendEmail(emailOptions);
+    await sendEmail("resetPassword", emailParams);
     return res.status(200).send({ params: emailParams , success: true });
   } catch (error: Error | any) {
     return res.status(500).json({ message: error.message });
   }
+};
+
+const sendEmail = async (name: string, params: any) => {
+  if (emailer != undefined) {
+    const emailClient = emailer();
+    const emailOptions = emailClient.buildEmail(name, params);
+    await emailClient.sendEmail(emailOptions);
+  };
 };

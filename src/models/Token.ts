@@ -3,7 +3,7 @@ import { Schema, Types, model } from "mongoose";
 export interface TokenInterface {
   user: Types.ObjectId;
   token: string;
-  craetedAt: Date;
+  createdAt: Date;
   expiresSec: number, // this is the expiry time in seconds
 };
 
@@ -17,7 +17,7 @@ const TokenSchema = new Schema<TokenInterface>({
     type: String,
     required: true,
   },
-  craetedAt: {
+  createdAt: {
     type: Date,
     required: true,
     default: Date.now

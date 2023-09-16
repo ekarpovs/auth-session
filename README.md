@@ -53,16 +53,24 @@ A auth with express session and passport, - a solution for Nodejs applications.
 - [ESLint](https://www.npmjs.com/package/eslint) - a static code analysis tool,     
 - [prettier](https://www.npmjs.com/package/prettier) - a code formatter,  
 - [jest](https://www.npmjs.com/package/jest) - a testing framework,  
+- [ts-jest](https://www.npmjs.com/package/ts-jest) - a Jest transformer with source map support that lets to use Jest to test projects written in TypeScript,  
 - [husky](https://www.npmjs.com/package/husky) - a tool that allows to use Git hooks,  
-- [rimraf](https://www.npmjs.com/package/rimraf) - a deep deletion module for node.  
+- [rimraf](https://www.npmjs.com/package/rimraf) - a deep deletion module for node,  
 - [move-file-cli](https://www.npmjs.com/package/move-file-cli) - a cross-platform alternative to mv for build scripts, etc.  
-- [cz-conventional-changelog"]() - Prompts for conventional changelog standard.  
+- [cz-conventional-changelog"]() - Prompts for conventional changelog standard,  
 - [semantic-release](https://www.npmjs.com/package/semantic-release) - automates the whole package release workflow including:   
   - determining the next version number,
   - generating the release notes, 
-  - publishing the package.    
+  - publishing the package.
 
 ## The project dependencies
+- [bcrypt](https://www.npmjs.com/package/bcrypt) - a library to hash passwords  ,  
+- [express](https://www.npmjs.com/package/express) - a web framework for Node.js  ,  
+- [express-session](https://www.npmjs.com/package/express-session) -a middleware to create a session with the given options  ,  
+- [mongoose](https://www.npmjs.com/package/mongoose) - a MongoDB object modeling tool  ,  
+- [passport](https://www.npmjs.com/package/passport) - Express-compatible authentication middleware  ,  
+- [passport-local](https://www.npmjs.com/package/passport-local) - strategy for authenticating with a username and password  ,  
+- [@ekarpovs/simple-email-client]() - a simple email client for send emails via the gmail service.   
 
 ### Local testing
 #### 1. Prepare the package archive

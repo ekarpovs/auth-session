@@ -3,8 +3,8 @@ import crypto from "node:crypto";
 import bcrypt from "bcrypt";
 import { Types } from "mongoose";
 
-import { BaseUser } from "../storage/baseUser";
-import { Token } from "../storage/Token";
+import { BaseUser } from "../models/baseUser";
+import { Token } from "../models/Token";
 
 const saltWorkFactor = Number(process.env.SALT_WORK_FACTOR);
 
@@ -43,11 +43,11 @@ export const resetPasswordRequestService = async (email: string) => {
   if (!user) throw new Error("the user doesn't exists");
   const resetToken = await createAndStoreResetPasswordToken(user._id);
 
-  const link = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}&id=${user._id}`;
   const resetRequestParams = {
-    email: String(user?.email),
     name: String(user?.name),
-    link: link,
+    email: String(user?.email),
+    token: resetToken,
+    id: user._id,
   };
   return resetRequestParams;
 };
@@ -95,7 +95,7 @@ const validateResetToken = async (id: string, token: string) => {
     throw new Error("Invalid or expired password reset token");
   }
   const dateNow = Date.now();
-  const tokenDate = passwordResetToken.craetedAt.getTime();
+  const tokenDate = passwordResetToken.createdAt.getTime();
   const expired = (dateNow - tokenDate) > passwordResetToken.expiresSec*1000;
   if (expired) {
     throw new Error("Invalid or expired password reset token");

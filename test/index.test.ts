@@ -6,19 +6,12 @@ import {
   BaseUser,
   CookieConfig,
   SessionConfig,
-  StorageConfig 
 } from '../src';
 
 
 describe("Auth with session config test", () => {
 
   test("Has to prepare the package configuration", async ()=> {
-    const storageConfig: StorageConfig = {
-      uri: "",
-      db: "",
-      collection: "",
-    };
-
     const app: Express = express();
 
     const cookieConfig: CookieConfig = {
@@ -38,7 +31,7 @@ describe("Auth with session config test", () => {
 
     const authConfig: AuthConfig = {
       app: app,
-      storageConfig: storageConfig,
+      storage: undefined,
       User: BaseUser,
       sessionConfig: sessionConfig,
     };
