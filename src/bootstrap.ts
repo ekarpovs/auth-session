@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Express } from "express";
 import session from "express-session";
 import passport from "passport";
 
 import { CookieConfig, SessionConfig, initSession } from "./configuration/session";
-import { setupPassport } from "./configuration/passport";
+import { checkAuthenticated, setupPassport } from "./configuration/passport";
 import { BaseUser } from "./models/baseUser";
 import LocalStrategy from "./strategies/local";
 import authRouter from "./core/router";
@@ -14,28 +15,31 @@ export type { CookieConfig };
 export type { SessionConfig };
 
 export { authRouter };
+export { checkAuthenticated };
 
 export type AuthConfig = {
   app: Express;
-  User: typeof BaseUser;
+  User: typeof BaseUser | any;
   sessionConfig: SessionConfig;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   storage?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emailer?: any;
+  logger?: any;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export let emailClient: any;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let emailClient: any;
 export const emailer = (): any => {
   return emailClient;
+};
+
+let extLogger: any;
+export const logger = (): any => {
+  return extLogger; 
 };
 
 export const initAuth = (authConfig: AuthConfig): void => {
   
   emailClient = authConfig.emailer;
+  extLogger = authConfig.logger;
 
   const sessionOptions = initSession(authConfig.sessionConfig);
 

@@ -5,6 +5,7 @@ import { Types } from "mongoose";
 
 import { BaseUser } from "../models/baseUser";
 import { Token } from "../models/Token";
+import { emailer, logger } from "../bootstrap";
 
 const saltWorkFactor = Number(process.env.SALT_WORK_FACTOR);
 
@@ -101,4 +102,19 @@ const validateResetToken = async (id: string, token: string) => {
     throw new Error("Invalid or expired password reset token");
   }
   return passwordResetToken;
+};
+
+export const sendEmailService = async (name: string, params: any): Promise<void> => {
+  if (emailer() != undefined) {
+    const emailClient = emailer();
+    const emailOptions = emailClient.buildEmail(name, params);
+    await emailClient.sendEmail(emailOptions);
+  };
+};
+
+export const loggerService = (message: any) : void => {
+  if (logger() != undefined) {
+    const writer = logger();
+    writer.info(message);
+  };
 };
