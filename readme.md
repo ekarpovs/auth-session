@@ -108,11 +108,102 @@ export const User = BaseUser.discriminator("user", UserSchema);
     password: "<the-account-owner-password>"
   };
 
-const emailClient = new EmailClient(config);
-authConfig.emailer = emailClient;
+  const emailClient = new EmailClient(config);
+  authConfig.emailer = emailClient;
 
   initAuth(authConfig);
 
-  // Usage
-  ...
+```
+### Extend BaseUser (example)
+```
+import { Schema } from "mongoose";
+
+import { BaseUser } from "@ekarpovs/auth-session";
+
+
+export interface UserInterface {
+  isSuperAdmin: boolean;
+  phone?: string;
+}
+
+const UserSchema = new Schema<UserInterface>({
+  isSuperAdmin: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  phone: {
+    type: String,
+    required: false,
+  },
+}, {collection: 'users'});
+
+export const User = BaseUser.discriminator("user", UserSchema);
+```
+
+### Protected router (example)
+```
+import { Router } from "express";
+
+import { checkAuthenticated } from "@ekarpovs/auth-session";
+import {
+  getAllUsers,
+  getUserById,
+} from "./controller";
+
+const userRouter = Router();
+
+userRouter.get("/", 
+  checkAuthenticated,
+  getAllUsers
+);
+
+userRouter.get(
+  "/user",
+  checkAuthenticated,
+  getUserById
+);
+
+export default userRouter;
+```
+
+### API
+  register:  
+  	 url: https://{uri}/auth/register  
+	 body: {  
+	    "name": "",  
+	    "email": "",  
+	    "password": "",  
+	}  
+   
+  login:  
+  	 url: https://{uri}/auth/login  
+	 body: {  
+	    "email": "",  
+	    "password": ""  
+	}  
+
+  logout:  
+  	url: https://{uri}/auth/logout  
+  change password:  
+  	url: https://{uri}/auth/change-password  
+	body: {  
+	    "email":"",  
+	    "password":"",  
+	    "passwordNew":""  
+	}  
+  
+  reset password request:  
+   	url: https://{uri}/auth/reset-password-request  
+   	body: {  
+	    "email": ""  
+	}  
+  
+  reset password:  
+   	url: https://{uri}/auth/reset-password  
+   	body: {  
+	    "user": "",  
+	    "token": "",  
+	    "password": ""  
+	}  
 ```
