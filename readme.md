@@ -21,35 +21,7 @@ A auth with express session and passport, - a solution for Nodejs applications.
 ```bash
   npm install @ekarpovs/auth-session
 ```
-### Usage
-#### Optional: extend user model, 
-```
-  // for example two property are added (isSuperAdmin and phone):
-import { Schema } from "mongoose";
-
-import { BaseUser } from "../lib/auth-session";
-
-
-export interface UserInterface {
-  isSuperAdmin: boolean;
-  phone?: string;
-}
-
-const UserSchema = new Schema<UserInterface>({
-  isSuperAdmin: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  phone: {
-    type: String,
-    required: false,
-  },
-}, {collection: 'users'});
-
-export const User = BaseUser.discriminator("user", UserSchema);
-```
-#### Initialize:
+### Usage:
 ```
   import express, { Express } from 'express';
 
