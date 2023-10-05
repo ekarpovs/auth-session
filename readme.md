@@ -168,40 +168,42 @@ export default userRouter;
 ```
 
 ### API
-  register:
-  	 url: https://{uri}/auth/register
-	 body: {
-	    "name": "",
-	    "email": "",
-	    "password": "",
-	}
-  
-  login:
-  	 url: https://{uri}/auth/login
-	 body: {
-	    "email": "",
-	    "password": ""
-	}
-  logout:
-  	url: https://{uri}/auth/logout
-  change password:
-  	url: https://{uri}/auth/change-password
-	body: {
-	    "email":"",
-	    "password":"",
-	    "passwordNew":""
-	} 
-  reset password request:
-   	url: https://{uri}/auth/reset-password-request
-   	body: {
-	    "email": ""
-	}
+  register:  
+  	 url: https://{uri}/auth/register  
+	 body: {  
+	    "name": "",  
+	    "email": "",  
+	    "password": "",  
+	}  
+   
+  login:  
+  	 url: https://{uri}/auth/login  
+	 body: {  
+	    "email": "",  
+	    "password": ""  
+	}  
 
-  reset password:
-   	url: https://{uri}/auth/reset-password
-   	body: {
-	    "user": "",
-	    "token": "",
-	    "password": ""
-	}
+  logout:  
+  	url: https://{uri}/auth/logout  
+  change password:  
+  	url: https://{uri}/auth/change-password  
+	body: {  
+	    "email":"",  
+	    "password":"",  
+	    "passwordNew":""  
+	}  
+  
+  reset password request:  
+   	url: https://{uri}/auth/reset-password-request  
+   	body: {  
+	    "email": ""  
+	}  
+  
+  reset password:  
+   	url: https://{uri}/auth/reset-password  
+   	body: {  
+	    "user": "",  
+	    "token": "",  
+	    "password": ""  
+	}  
 ```
