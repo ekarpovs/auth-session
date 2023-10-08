@@ -25,27 +25,10 @@ export type AuthConfig = {
 };
 
 export const initAuth = (authConfig: AuthConfig) => {
-  
+  setupExpress(authConfig);
+
   const emailer = authConfig.emailer;
   const logger: any = authConfig.logger;
-
-  const sessionOptions = initSession(authConfig.sessionConfig);
-
-  authConfig.app.use(session({...sessionOptions, ...authConfig.storage}));
-
-  setupPassport(authConfig.User);
-
-  LocalStrategy.init(passport, authConfig.User);
-
-  // init passport on every route call
-  authConfig.app.use(passport.initialize());
-  // passport.session has to be used after 
-  // express.session in order to work properly.
-  // allow passport to use "express-session"
-  authConfig.app.use(passport.session());
-  // passport function that calls the strategy to be executed
-  authConfig. app.use(passport.authenticate('session'));
-
   const authRouter = setupAuthRouter({emailer, logger});
 
   const isAuthenticated = (req: Request ,res: Response, next: NextFunction): Response | void => {
@@ -63,4 +46,23 @@ export const initAuth = (authConfig: AuthConfig) => {
   };
 
   return { authRouter, isAuthenticated };
+};
+
+const setupExpress = (authConfig: AuthConfig) => {
+  // setup session
+  const sessionOptions = initSession(authConfig.sessionConfig);
+  authConfig.app.use(session({...sessionOptions, ...authConfig.storage}));
+
+  setupPassport(authConfig.User);
+
+  LocalStrategy.init(passport, authConfig.User);
+
+  // setup passport on every route call
+  authConfig.app.use(passport.initialize());
+  // passport.session has to be used after 
+  // express.session in order to work properly.
+  // allow passport to use "express-session"
+  authConfig.app.use(passport.session());
+  // passport function that calls the strategy to be executed
+  authConfig. app.use(passport.authenticate('session')); 
 };
