@@ -1,29 +1,22 @@
 import { Request, Response, Router } from "express";
-import { 
-  resetPassword,
-  resetPasswordRequest,
-  login,
-  logout,
-  register,
-  changePassword
-} from "./controller";
+import { setupAuthController } from "./controller";
 
-const authRouter = Router();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const setupAuthRouter = ({ emailer, logger }: any) => {
+  const cnt = setupAuthController({ emailer, logger });
+  const router = Router();
+  logger.info('Setup Auth Router');
 
-authRouter.get("/", (req: Request, res: Response) => {
-  res.send('hello world');
-});
+  router.get("/", (req: Request, res: Response) => {
+    res.send('hello world');
+  });
+  
+  router.post("/login", cnt.login);
+  router.get("/logout", cnt.logout);
+  router.post("/register", cnt.register);
+  router.post("/change-password", cnt.changePassword); 
+  router.post("/reset-password-request", cnt.resetPasswordRequest);
+  router.post("/reset-password", cnt.resetPassword);  
 
-authRouter.post("/login", login);
-
-authRouter.get("/logout", logout);
-
-authRouter.post("/register", register);
-
-authRouter.post("/change-password", changePassword);
-
-authRouter.post("/reset-password-request", resetPasswordRequest);
-
-authRouter.post("/reset-password", resetPassword);
-
-export default authRouter;
+  return router;
+};

@@ -1,6 +1,6 @@
 {
   "name": "@ekarpovs/auth-session",
-  "version": "0.0.0-development",
+  "version": "0.0.1-development",
   "description": "A npm package for use in Node.js projects.",
   "exports": {
     ".": {

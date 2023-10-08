@@ -5,16 +5,15 @@ import passport from "passport";
 
 import { CookieConfig, SessionConfig, initSession } from "./configuration/session";
 import { setupPassport } from "./configuration/passport";
+
 import { BaseUser } from "./models/baseUser";
 import LocalStrategy from "./strategies/local";
-import authRouter from "./core/router";
+import { setupAuthRouter } from "./core/router";
 
 // reexport 
 export { BaseUser };
 export type { CookieConfig };
 export type { SessionConfig };
-
-export { authRouter };
 
 export type AuthConfig = {
   app: Express;
@@ -25,20 +24,10 @@ export type AuthConfig = {
   logger?: any;
 };
 
-let emailClient: any;
-export const emailer = (): any => {
-  return emailClient;
-};
-
-let extLogger: any;
-export const logger = (): any => {
-  return extLogger; 
-};
-
 export const initAuth = (authConfig: AuthConfig) => {
   
-  emailClient = authConfig.emailer;
-  extLogger = authConfig.logger;
+  const emailer = authConfig.emailer;
+  const logger: any = authConfig.logger;
 
   const sessionOptions = initSession(authConfig.sessionConfig);
 
@@ -57,6 +46,8 @@ export const initAuth = (authConfig: AuthConfig) => {
   // passport function that calls the strategy to be executed
   authConfig. app.use(passport.authenticate('session'));
 
+  const authRouter = setupAuthRouter({emailer, logger});
+
   const isAuthenticated = (req: Request ,res: Response, next: NextFunction): Response | void => {
   /**
    * If the user is already authenticated and the browser already has a session id 
@@ -71,5 +62,5 @@ export const initAuth = (authConfig: AuthConfig) => {
     res.sendStatus(401);
   };
 
-  return isAuthenticated;
+  return { authRouter, isAuthenticated };
 };
