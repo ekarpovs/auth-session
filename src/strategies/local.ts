@@ -17,13 +17,12 @@
 
 import { Request } from "express";
 import { Strategy } from "passport-local";
-import bcrypt from "bcrypt";
+import { cryptUtils } from "../utils/utils";
 
 class LocalStrategy {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static init(app: any, User: any): void {
-    const SALT_WORK_FACTOR = Number(process.env.SALT_WORK_FACTOR) || 10;
-
+    const crypt = cryptUtils();
     // configure the register strategy.
     app.use("local-register", new Strategy({
       // by default, local strategy uses username and password, 
@@ -41,7 +40,7 @@ class LocalStrategy {
           done(null, false, { message: "User already exist"});
         } else {
           const newUser = new User(req.body);
-          newUser.password = await bcrypt.hash(password, SALT_WORK_FACTOR);
+          newUser.password = await crypt.hash(password);
           try {
             const user = await newUser.save();
             done(null, user);
@@ -66,7 +65,7 @@ class LocalStrategy {
         if (user && user.email != email) {
           done(null, false, { message: "User or password incorrect"});
         }
-        if (!await bcrypt.compare(password, user.password)) {
+        if (!await crypt.compare(password, user.password)) {
           done(null, false, {message: "User or password incorrect"});
         }
         else {

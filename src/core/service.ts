@@ -1,41 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import crypto from "node:crypto";
-import bcrypt from "bcrypt";
 import { Types } from "mongoose";
 
 import { BaseUser } from "../models/baseUser";
+import { cryptUtils } from "../utils/utils";
 import { Token } from "../models/Token";
 
 export const setupAuthService = ({logger}: any) => {
+  const crypt = cryptUtils();
   logger.info('Setup Auth Service');
-  const saltWorkFactor = Number(process.env.SALT_WORK_FACTOR);
 
   const changePassword = async (email: string, password: string, passwordNew: string) => {
   
-    let user: any = await BaseUser.findOne({ email }); 
+    const user: any = await BaseUser.findOne({ email }); 
     if (!user) throw new Error("the user doesn't exists!");
   
     // Check credentials
-    user.comparePassword(password, (err: any, isMatch: boolean) => {
-      if (err) {
-        throw new Error("Something wrong with credentials");
-      }
-      if (!isMatch) {
-        throw new Error("User or password incorrect");
-      }
-    });
+    if (!await crypt.compare(password, user.password)) {
+      throw new Error("Something wrong with credentials");
+    };
   
     // Change password
-    const hash = await bcrypt.hash(passwordNew, saltWorkFactor);
-    user = await BaseUser.findOneAndUpdate(
+    const hash = await crypt.hash(passwordNew);
+    const updatedUser = await BaseUser.findOneAndUpdate(
       { email },
-      { $set: { password: hash } },
+      { password: hash },
       { new: true }
     );
   
     const changeParams = {
-      email: String(user?.email),
-      name: String(user?.name),
+      email: String(updatedUser?.email),
+      name: String(updatedUser?.name),
     };
     return changeParams;
   };
@@ -59,7 +54,7 @@ export const setupAuthService = ({logger}: any) => {
     const token = await Token.findOne({user: id});
     if (token) await token.deleteOne();
     const resetPasswordToken = crypto.randomBytes(32).toString("hex");
-    const hash = await bcrypt.hash(resetPasswordToken, saltWorkFactor);
+    const hash = await crypt.hash(resetPasswordToken);
   
     // save the token 
     await new Token({
@@ -72,10 +67,10 @@ export const setupAuthService = ({logger}: any) => {
   
   const resetPassword = async (id: string, token: string, password: string) => {
     const passwordResetToken = await validateResetToken(id, token);
-    const hash = await bcrypt.hash(password, saltWorkFactor);
+    const hash = await crypt.hash(password);
     const user = await BaseUser.findOneAndUpdate(
       { _id: id },
-      { $set: { password: hash } },
+      { password: hash },
       { new: true }
     );
   
@@ -92,7 +87,7 @@ export const setupAuthService = ({logger}: any) => {
     if (!passwordResetToken) {
       throw new Error("Invalid or expired password reset token");
     }
-    const isValid = await bcrypt.compare(token, passwordResetToken.token);
+    const isValid = await crypt.compare(token, passwordResetToken.token);
     if (!isValid) {
       throw new Error("Invalid or expired password reset token");
     }
