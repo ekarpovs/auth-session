@@ -55,7 +55,7 @@ export const setupAuthController = ({ emailer, logger }: any) => {
     const { email, password, passwordNew } = req.body;
     try {
       const emailParams = await srv.changePassword(email, password, passwordNew);
-      await sendEmail("changePassword", emailParams);
+      // await sendEmail("changePassword", emailParams);
       return res.status(200).send({ params: emailParams , success: true });
     } catch (error: Error | any) {
       return res.status(500).json({ message: error.message });
