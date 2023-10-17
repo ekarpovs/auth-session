@@ -17,10 +17,12 @@
 
 import { Request } from "express";
 import { Strategy } from "passport-local";
+import { cryptUtils } from "../utils/utils";
 
 class LocalStrategy {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static init(app: any, User: any): void {
+    const crypt = cryptUtils();
     // configure the register strategy.
     app.use("local-register", new Strategy({
       // by default, local strategy uses username and password, 
@@ -30,7 +32,7 @@ class LocalStrategy {
       // allows to pass the entire request to the callback
       passReqToCallback: true
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }, async (req: Request, email: string, _password: string, done: any) => {
+    }, async (req: Request, email: string, password: string, done: any) => {
       try {
         if (!email) done(null, false);
         const user = await User.findOne({"email": email.toLowerCase()});
@@ -38,6 +40,7 @@ class LocalStrategy {
           done(null, false, { message: "User already exist"});
         } else {
           const newUser = new User(req.body);
+          newUser.password = await crypt.hash(password);
           try {
             const user = await newUser.save();
             done(null, user);
@@ -62,14 +65,12 @@ class LocalStrategy {
         if (user && user.email != email) {
           done(null, false, { message: "User or password incorrect"});
         }
-        await user.comparePassword(password, (error: Error, isMatch: boolean) => {
-          if (error) { done(null, error); }
-          if (!isMatch) {
-            done(null, false, { message: "User or password incorrect"});
-          } else {
-            done(null, user);
-          }
-        });
+        if (!await crypt.compare(password, user.password)) {
+          done(null, false, {message: "User or password incorrect"});
+        }
+        else {
+          done(null, user);
+        }
       } catch (e) {
         done(e);
       }

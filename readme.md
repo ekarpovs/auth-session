@@ -1,4 +1,4 @@
-## Authentication with session
+## Authentication with session v-0.0.1
 
 A auth with express session and passport, - a solution for Nodejs applications.
 
@@ -25,65 +25,72 @@ A auth with express session and passport, - a solution for Nodejs applications.
 ```
   import express, { Express } from 'express';
 
-  import { 
-    AuthConfig,
-    BaseUser,
-    CookieConfig,
-    SessionConfig,
-  } from '@ekarpovs/auth-session';
-  
-  // Optional:
-  // import { StorageConfig, sessionStorage } from '@ekarpovs/session-storage';
-  // import { EmailClient } from '@ekarpovs/simple-email-client';
+import {
+  AuthConfig,
+  CookieConfig,
+  initAuth,
+  SessionConfig,
+} from '@ekarpovs/auth-session';
+import { StorageConfig, sessionStorage } from '@ekarpovs/session-storage-mongo';
+// Optional:
+import { EmailClient } from '@ekarpovs/simple-email-client';
+import { LoggerOptions, initLogger } from '@ekarpovs/simple-logger';
+import { errorHandler } from '@ekarpovs/simple-error-handler';
+
+import { setupUserRouter, User } from './users';
 
   // Somewhere in an application
   const app: Express = express();
 
 
   // Configuration
-  const cookieConfig: CookieConfig = {
-    secure: "false",
-    sameSite: "lax",
-    httpOnly: "true",
-    maxAge: "3600000",
-  };
+// Authentication
+const cookieConfig: CookieConfig = {
+  secure: process.env.COOKIE_SECURE,
+  sameSite: process.env.COOKIE_SAME_SITE,
+  httpOnly: process.env.COOKIE_HTTP_ONLY,
+  maxAge: process.env.COOKIE_MAX_AGE,
+};
 
-  const sessionConfig: SessionConfig = {
-    name: "",
-    secret: "",
-    saveUninitialized: "false",
-    cookie: cookieConfig,
-    resave: "false"
-  };
+const sessionConfig: SessionConfig = {
+  name: process.env.SESSION_NAME,
+  secret: process.env.SESSION_SECRET,
+  saveUninitialized: process.env.SESSION_SAVE_UNINITIALIZED,
+  cookie: cookieConfig,
+  resave: process.env.SESSION_RESAVE,
+};
 
-  const authConfig: AuthConfig = {
-    app: app,
-    storage: undefined,
-    User: BaseUser,
-    sessionConfig: sessionConfig,
-  };
+const authConfig: AuthConfig = {
+  app: app,
+  storage: undefined,
+  User: User,
+  sessionConfig: sessionConfig,
+};
 
-  // Optional: - inject session-storage
-  const storageConfig: StorageConfig = {
-    uri: "",
-    db: "",
-    collection: "",
-  };
+// Optional: - inject session-storage
+const storageConfig: StorageConfig = {
+  uri: process.env.SESSION_STORAGE_URI,
+  db: process.env.SESSION_STORAGE_DB,
+  collection: process.env.SESSION_STORAGE_COLLECTION,
+};
+const storage = sessionStorage(storageConfig);
+authConfig.storage = { store: storage };
 
-  // const storage = sessionStorage(storageConfig);
-  // authConfig.storage = { store: storage};
+// Optional: inject simple-email-client and (or) simple-logger
+authConfig.emailer = emailClient;
+authConfig.logger = logger;
 
-  // Optional: inject simple-email-client
-  const config = {
-    name: "gmail",
-    user: "<the-account-owner-email>",
-    password: "<the-account-owner-password>"
-  };
+const { authRouter, isAuthenticated } = initAuth(authConfig);
 
-  const emailClient = new EmailClient(config);
-  authConfig.emailer = emailClient;
+const router = Router();
+router.use('/auth', authRouter);
+router.use(
+  '/users',
+  setupUserRouter({ isAuthenticated }),
+);
 
-  initAuth(authConfig);
+...
+
 
 ```
 ### Extend BaseUser (example)
@@ -94,15 +101,15 @@ import { BaseUser } from "@ekarpovs/auth-session";
 
 
 export interface UserInterface {
-  isSuperAdmin: boolean;
+  role: string; // if an authorization will be used
   phone?: string;
 }
 
 const UserSchema = new Schema<UserInterface>({
-  isSuperAdmin: {
-    type: Boolean,
+  role: { // if authorization will be used
+    type: string,
     required: true,
-    default: false,
+    default: 'guest',
   },
   phone: {
     type: String,
@@ -113,33 +120,31 @@ const UserSchema = new Schema<UserInterface>({
 export const User = BaseUser.discriminator("user", UserSchema);
 ```
 
-### Protected router (example)
+### Protected router (example of an implementation)
 ```
-import { Router } from "express";
+import { Router } from 'express';
 
-import { checkAuthenticated } from "@ekarpovs/auth-session";
-import {
-  getAllUsers,
-  getUserById,
-} from "./controller";
+import { setupUserController } from './controller';
 
-const userRouter = Router();
-
-userRouter.get("/", 
-  checkAuthenticated,
-  getAllUsers
-);
-
-userRouter.get(
-  "/user",
-  checkAuthenticated,
-  getUserById
-);
-
-export default userRouter;
+export const setupUserRouter = ({ isAuthenticated }) => {
+  const cnt = setupUserController({ logger });
+  const router = Router();
+  router.get(
+    '/',
+    isAuthenticated,
+    cnt.getAllUsers,
+  );
+  router.get(
+    '/user',
+    isAuthenticated,
+    cnt.getUserById,
+  );
+  return router;
+};
 ```
 
 ### API
+```
   register:  
   	 url: https://{uri}/auth/register  
 	 body: {  
