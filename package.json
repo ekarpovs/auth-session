@@ -1,6 +1,6 @@
 {
   "name": "@ekarpovs/auth-session",
-  "version": "0.0.1-development",
+  "version": "0.0.0",
   "description": "A npm package for use in Node.js projects.",
   "exports": {
     ".": {
@@ -27,9 +27,9 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "test": "jest --detectOpenHandles --coverage --verbose",
+    "prepack": "npm run build",
     "rename": "./node_modules/move-file-cli/cli.js README.md gitREADME.md",
     "rename:back": "./node_modules/move-file-cli/cli.js gitREADME.md README.md",
-    "prepack": "npm run build",
     "pack:local": "npm run rename&& npm run build && npm pack && npm run rename:back",
     "prepare": "husky install",
     "semantic-release": "semantic-release --branches main",
@@ -69,7 +69,6 @@
     "@types/bcrypt": "^5.0.0",
     "@types/express-session": "^1.17.7",
     "@types/jest": "^29.5.4",
-    "@types/nodemailer": "^6.4.9",
     "@types/passport": "^1.0.12",
     "@types/passport-local": "^1.0.35",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
@@ -94,7 +93,7 @@
     "bcrypt": "^5.1.1",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "mongoose": "^7.5.0",
+    "mongoose": "^7.6.2",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0"
   }
